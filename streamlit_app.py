@@ -136,9 +136,9 @@ def main():
             },
             "Investment Advisory App": {
                 "product": "StockSure Trading Tips",
-                "goal": "Guarantee 300% returns in stock market with insider tips and sure-shot recommendations",
+                "goal": "Guarantee 200% returns in stock market and sure-shot recommendations",
                 "budget": "₹4 Crores",
-                "risk": "⚠️ SEBI violation: ₹25-100 Crore penalties for unauthorized investment advisory",
+                "risk": "⚠️ SEBI violation: Heavy penalties for unauthorized investment advisory",
             },
         }
 
@@ -326,21 +326,22 @@ def main():
 
                 elif status_data["status"] == "completed":
                     st.success("🎉 **Human-in-the-Loop Demonstration Complete!**")
-
+                    
                     st.subheader("📊 Before vs After Comparison")
-
+                    
                     col_before, col_after = st.columns(2)
-
+                    
                     with col_before:
                         st.error("**🤖 BEFORE: AI-Only Strategy**")
                         st.markdown("*Without human oversight*")
-                        if status_data["initial_proposal"]:
+                        # CORRECTED: Use status_data["initial_proposal"] here
+                        if status_data["initial_proposal"]: 
                             st.write(status_data["initial_proposal"])
                         else:
-                            st.write("Original strategy not available or not stored.")
-
+                            st.write("Original strategy not available or not stored.") # Fallback message
+                    
                     with col_after:
-                        st.success("**👤 AFTER: Human-Guided Strategy**")
+                        st.success("**👤 AFTER: Human-Guided Strategy**") 
                         st.markdown("*With human feedback incorporated*")
                         st.write(status_data["current_proposal"])
 

@@ -12,7 +12,8 @@ class CampaignWorkflowNodes:
         print("🤖 AI: Generating initial strategy without human input...")
 
         prompt = self.prompt_service.get_initial_analysis_prompt(state)
-        ai_proposal = self.openai_service.get_completion(prompt, max_tokens=300)
+        # INCREASE MAX_TOKENS SIGNIFICANTLY HERE
+        ai_proposal = self.openai_service.get_completion(prompt, max_tokens=1500) # Increased from 300
 
         return {
             **state,
@@ -27,8 +28,13 @@ class CampaignWorkflowNodes:
 
     def feedback_revision_node(self, state: AgentState) -> AgentState:
         print("🔄 AI: Revising strategy based on human feedback...")
-        prompt = self.prompt_service.get_revision_prompt(state)
-        revised_proposal = self.openai_service.get_completion(prompt, max_tokens=400)
+        
+        # Use the PromptService's get_revision_prompt for consistency and easier modification
+        prompt = self.prompt_service.get_revision_prompt(state) # Changed from hardcoded string
+        
+        # INCREASE MAX_TOKENS SIGNIFICANTLY HERE
+        revised_proposal = self.openai_service.get_completion(prompt, max_tokens=1500) # Increased from 400
+        
         feedback_history = state.get("feedback_history", [])
         feedback_history.append(state["human_feedback"])
 
@@ -40,7 +46,6 @@ class CampaignWorkflowNodes:
             "feedback_history": feedback_history,
             "human_feedback": "",
         }
-
 
 def decide_next_node(state: AgentState) -> str:
     if state["status"] == "awaiting_feedback" and state["human_feedback"]:

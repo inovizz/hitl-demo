@@ -13,7 +13,7 @@ from models import (
     AgentState
 )
 from services import OpenAIService, SessionManager
-from workflow import CampaignWorkflowNodes
+from workflow import CampaignWorkflowNodes # Ensure this is imported as you are directly using its nodes
 
 
 load_dotenv()
@@ -77,11 +77,11 @@ async def start_campaign_workflow(request: WorkflowStartRequest):
         openai_service = OpenAIService()
         print(f"✅ OpenAI service initialized successfully")
         
-        workflow_nodes = CampaignWorkflowNodes(openai_service)
+        workflow_nodes = CampaignWorkflowNodes(openai_service) # Use CampaignWorkflowNodes
         
         initial_state: AgentState = {
             "current_proposal": "",
-            "initial_proposal": "",
+            "initial_proposal": "", # Ensure initial_proposal is part of AgentState
             "human_feedback": "",
             "status": "initializing",
             "iteration": 0,
@@ -95,7 +95,7 @@ async def start_campaign_workflow(request: WorkflowStartRequest):
         }
         
         session_id = session_manager.create_session(initial_state)
-        active_workflows[session_id] = workflow_nodes
+        active_workflows[session_id] = workflow_nodes # Store the nodes instance
         
         print(f"\n🚀 Starting marketing campaign workflow: {session_id}")
         print(f"📱 Product: {request.product_name}")
@@ -107,7 +107,8 @@ async def start_campaign_workflow(request: WorkflowStartRequest):
         
         return CampaignResponse(
             session_id=session_id,
-            current_proposal=processed_state["current_proposal"][:500] + "..." if len(processed_state["current_proposal"]) > 500 else processed_state["current_proposal"],
+            # REMOVED STRING SLICING HERE
+            current_proposal=processed_state["current_proposal"], 
             status=processed_state["status"],
             iteration=processed_state["iteration"],
             message="Campaign workflow started. AI has generated initial aggressive marketing strategy.",
@@ -139,10 +140,9 @@ async def get_campaign_status(session_id: str):
         status=state["status"],
         iteration=state["iteration"],
         feedback_history=state["feedback_history"],
-        # context_info was previously used to try and display initial_proposal, but it's not the correct field.
-        # Now, `initial_proposal` is explicitly part of the StatusResponse.
-        context_info=state.get("context_info", "")[:300] + "..." if state.get("context_info") and len(state.get("context_info")) > 300 else state.get("context_info", ""),
-        initial_proposal=state.get("initial_proposal", ""), # ADD THIS LINE
+        # REMOVED STRING SLICING HERE
+        context_info=state.get("context_info", ""), 
+        initial_proposal=state.get("initial_proposal", ""), # Ensure this is passed correctly
         campaign_details={
             "objective": state["campaign_objective"],
             "budget": state["budget_allocation"],
@@ -172,16 +172,17 @@ async def submit_campaign_feedback(session_id: str, feedback_request: FeedbackRe
         current_state = session_manager.get_session(session_id)
         current_state["human_feedback"] = feedback_request.feedback
         
-        workflow_nodes = active_workflows[session_id]
+        workflow_nodes = active_workflows[session_id] # Retrieve the nodes instance
         
-        final_state = workflow_nodes.feedback_revision_node(current_state)
+        final_state = workflow_nodes.feedback_revision_node(current_state) # Direct call
         
         session_manager.update_session(session_id, final_state)
         
         return FeedbackResponse(
             message="Campaign feedback processed successfully",
             new_state={
-                "current_proposal": final_state["current_proposal"][:500] + "..." if len(final_state["current_proposal"]) > 500 else final_state["current_proposal"],
+                # REMOVED STRING SLICING HERE
+                "current_proposal": final_state["current_proposal"],
                 "status": final_state["status"],
                 "iteration": final_state["iteration"],
                 "feedback_history": final_state["feedback_history"]
@@ -210,4 +211,3 @@ async def list_sessions():
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-    

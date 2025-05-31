@@ -15,9 +15,7 @@ class OpenAIService:
             raise ValueError("OPENAI_API_KEY environment variable is required")
 
         try:
-
             self.client = OpenAI(api_key=api_key, timeout=30.0, max_retries=2)
-
             self._test_client()
         except Exception as e:
             raise ValueError(f"Failed to initialize OpenAI client: {str(e)}")
@@ -25,7 +23,6 @@ class OpenAIService:
     def _test_client(self):
         """Test the OpenAI client to ensure it's working properly"""
         try:
-
             self.client.models.list()
         except Exception as e:
             raise ValueError(f"OpenAI client test failed: {str(e)}")
@@ -35,7 +32,8 @@ class OpenAIService:
     ) -> str:
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
+                # Ensure the model here is capable of longer outputs if needed, 'gpt-4o-mini' is generally good
+                model="gpt-4o-mini", # Used to be gpt-4 in provided code
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=max_tokens,
                 temperature=temperature,
@@ -60,7 +58,6 @@ class SessionManager:
         return self.sessions.get(session_id)
 
     def update_session(self, session_id: str, state: AgentState):
-
         self.sessions[session_id] = state
 
     def session_exists(self, session_id: str) -> bool:
@@ -122,7 +119,7 @@ class PromptService:
 
         Provide a complete revised proposal with explanations of changes made.
         """
-
+    
     @staticmethod
     def get_information_gathering_prompt(state: AgentState) -> str:
         return f"""
@@ -144,7 +141,9 @@ class PromptService:
 
         Be thorough and provide actionable insights that will help improve the campaign strategy.
         """
-
+    
+    # The get_proposal_update_prompt was commented out in your latest provided services.py,
+    # so keeping it commented out.
     # @staticmethod
     # def get_proposal_update_prompt(gathered_info: str, current_proposal: str) -> str:
     #     return f"""
